@@ -1,0 +1,1 @@
+<h1>Empty Theme - index.php</h1>

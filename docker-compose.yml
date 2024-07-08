@@ -2,38 +2,35 @@ services:
   wordpress:
     depends_on:
       - database
-    image: wordpress # Using the official WordPress image
+    image: wordpress:latest
     ports:
-      - 8000:80 # Mapping port 80 of the container to port 8000 of the host
+      - "8000:80"
     environment:
-      # Environment variables for WordPress to connect to the database
-      WORDPRESS_DB_HOST: '${MYSQL_HOST}'
-      WORDPRESS_DB_NAME: '${MYSQL_DATABASE}'
-      WORDPRESS_DB_USER: '${MYSQL_USER}'
-      WORDPRESS_DB_PASSWORD: '${MYSQL_PASSWORD}'
+      WORDPRESS_DB_HOST: "${MYSQL_HOST}"
+      WORDPRESS_DB_NAME: "${MYSQL_DATABASE}"
+      WORDPRESS_DB_USER: "${MYSQL_USER}"
+      WORDPRESS_DB_PASSWORD: "${MYSQL_PASSWORD}"
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', 'http://localhost:8000');
+        define('WP_SITEURL', 'http://localhost:8000');
+        define('WP_DEFAULT_THEME', 'empty-theme');
     volumes:
-      # Mapping the wp-content directory for persistence
       - ./wp/wp-content:/var/www/html/wp-content
-      # Optionally, map the entire WordPress directory to persist all files
       - wordpress-data:/var/www/html
-    command: sh -c "rm -rf /var/www/html/wp-content/themes/* && docker-entrypoint.sh apache2-foreground"
+    command: sh -c "rm -rf /var/www/html/wp-content/themes/twenty* && docker-entrypoint.sh apache2-foreground"
 
   database:
-    image: mysql:latest # Using the latest official MySQL image
+    image: mysql:latest
     ports:
-      - 3306:3306 # Mapping port 3306 of the container to port 3306 of the host
+      - "3306:3306"
     environment:
-      # Environment variables for MySQL configuration
-      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
-      MYSQL_DATABASE: '${MYSQL_DATABASE}'
-      MYSQL_USER: '${MYSQL_USER}'
-      MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     volumes:
-      # Mapping the MySQL data directory for persistence
       - mysql-data:/var/lib/mysql
 
 volumes:
-  # Named volume for MySQL data
-  mysql-data: # Named volume for WordPress data
-
+  mysql-data:
   wordpress-data:
